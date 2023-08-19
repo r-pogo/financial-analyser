@@ -28,14 +28,14 @@ class FinancialDb:
     def update_record(self, expense, amount, date, row_id):
         """Allows to update data from the database"""
         self.cur.execute(
-            """UPDATE expenses_record SET item_name = ?, item_price = ?,
-            purchase_date = ? WHERE rowid = ?""",
+            """UPDATE expenses_record SET expense = ?, amount = ?,
+            date = ? WHERE rowid = ?""",
             (expense, amount, date, row_id))
         self.con.commit()
 
     def delete_record(self, row_id):
         """Allows to delete data from the database"""
-        self.cur.execute("DELETE FROM expense_record WHERE rowid=?", (row_id,))
+        self.cur.execute("DELETE FROM expenses_record WHERE rowid=?", (row_id,))
         self.con.commit()
 
     def __del__(self):

@@ -14,6 +14,16 @@ selected_rowid = 0
 
 
 # ---------------------------- FUNCTIONALITIES ------------------------------ #
+def refresh_data():
+    """Allows to view the update in real-time. Whenever an update or deleted
+    operation is performed a refresh is needed so the changes can be viewed in
+    real time"""
+
+    for item in treeview.get_children():
+        treeview.delete(item)
+    fetch_records()
+
+
 def clear_entries():
     expense.delete(0, 'end')
     amount.delete(0, 'end')
@@ -35,17 +45,8 @@ def fetch_records():
     treeview.after(400, refresh_data)
 
 
-def refresh_data():
-    """Allows to view the update in real-time. Whenever an update or deleted
-    operation is performed a refresh is needed so the changes can be viewed in
-    real time"""
-
-    for item in treeview.get_children():
-        treeview.delete(item)
-    fetch_records()
-
-
-def select_record(event):  # TODO Cos nie dziala
+def select_record(
+        event):  # TODO czasami trzeba kliknac kilka razy, zrobic podswietleni dla wybranego wiersza
     global selected_rowid
     selected = treeview.focus()
     val = treeview.item(selected, 'values')
@@ -58,7 +59,29 @@ def select_record(event):  # TODO Cos nie dziala
         date_var.set(str(d))
 
 
+def update_record():
+    global selected_rowid
+
+    selected = treeview.focus()
+    # Update record
+    try:
+        treeview.item(selected, text="",
+                      values=(expense.get(), amount.get(), date.get()))
+        DATA.update_record(expense.get(), amount.get(), date.get(),
+                           selected_rowid)
+
+    except Exception as ep:
+        messagebox.showerror('Error', ep)
+
+
+def delete_row():
+    global selected_rowid
+    DATA.delete_record(selected_rowid)
+    refresh_data()
+
+
 # ---------------------------- UI SETUP ------------------------------- #
+
 
 # Main window
 FONT = ('Times new roman', 11)
@@ -115,36 +138,35 @@ save_btn = tk.Button(operation_widgets, text='Save Record', font=FONT,
 save_btn.grid(row=0, column=2, sticky=tk.EW, padx=(10, 0))
 
 clear_btn = tk.Button(operation_widgets, text='Clear Entry', font=FONT,
-                      command=clear_entries, bg='#D9B036', fg='white')
+                      command=clear_entries, bg='#7D9EC0', fg='white')
 clear_btn.grid(row=1, column=2, sticky=tk.EW, padx=(10, 0))
 
 import_btn = tk.Button(operation_widgets, text='Import File', font=FONT,
-                       command=None, bg='#D9B036', fg='white')
-import_btn.grid(row=1, column=4, sticky=tk.EW, padx=(10, 0))
+                       command=None, bg='#F0F8FF', fg='black')  # TODO function
+import_btn.grid(row=0, column=4, sticky=tk.EW, padx=(10, 0))
 
-exit_btn = tk.Button(operation_widgets, text='Exit', font=FONT, command=None,
-                     bg='#D33532', fg='white')
+exit_btn = tk.Button(operation_widgets, text='Exit', font=FONT,
+                     command=window.destroy)
 exit_btn.grid(row=2, column=2, sticky=tk.EW, padx=(10, 0))
 
-total_bal_btn = tk.Button(operation_widgets, text='Total Balance', font=FONT,
-                          bg='#486966', fg='white', command=None)
-total_bal_btn.grid(row=0, column=3, sticky=tk.EW, padx=(10, 0))
-
 total_spent_btn = tk.Button(operation_widgets, text='Total Spent', font=FONT,
-                            bg='#486966', fg='white', command=None)
-total_spent_btn.grid(row=0, column=4, sticky=tk.EW, padx=(10, 0))
-
+                            bg='#486966', fg='white',
+                            command=lambda: messagebox.showinfo('Total',
+                            DATA.read_record('SELECT SUM(amount) FROM '
+                            'expenses_record ')))
+total_spent_btn.grid(row=0, column=3, sticky=tk.EW, padx=(10, 0))
+# com
 update_btn = tk.Button(operation_widgets, text='Update', font=FONT,
-                       bg='#C2BB00', fg='white', command=None)
+                       bg='#C2BB00', fg='white', command=update_record)
 update_btn.grid(row=1, column=3, sticky=tk.EW, padx=(10, 0))
 
 delete_btn = tk.Button(operation_widgets, text='Delete', font=FONT,
-                       bg='#BD2A2E', fg='white', command=None)
+                       bg='#BD2A2E', fg='white', command=delete_row)
 delete_btn.grid(row=2, column=3, sticky=tk.EW, padx=(10, 0))
 
-chart_btn = tk.Button(operation_widgets, text='Visualize Data', font=FONT,
-                      bg='#BD2A2E', fg='white', command=None)
-chart_btn.grid(row=2, column=4, sticky=tk.EW, padx=(10, 0))
+report_btn = tk.Button(operation_widgets, text='Report', font=FONT,
+                      bg='#FAEBD7', fg='black', command=None)  # TODO function
+report_btn.grid(row=1, column=4, sticky=tk.EW, padx=(10, 0))
 
 ##################
 # tree_scrollbar #
@@ -164,6 +186,8 @@ treeview.heading(2, text="Expense", )
 treeview.heading(3, text="Amount")
 treeview.heading(4, text="Date")
 
+treeview.bind("<ButtonRelease-1>", select_record)
+
 style = ttk.Style()
 style.theme_use("default")
 style.map("Treeview")
@@ -179,7 +203,7 @@ fetch_records()
 ########
 # Menu #
 ########
-
+ # TODO Skonczyc cale menu
 menu = tk.Menu(window)
 window.configure(menu=menu)
 
