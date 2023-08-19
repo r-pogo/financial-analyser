@@ -9,15 +9,15 @@ class FinancialDb:
         self.cur = self.con.cursor()
         self.cur.execute(
             """CREATE TABLE IF NOT EXISTS expenses_record (
-            item_name text, 
-            item_price float, 
-            purchase_date date)""")
+            expense text, 
+            amount float, 
+            date date)""")
         self.con.commit()
 
-    def create_record(self, item_name, item_price, purchase_date):
+    def create_record(self, expense, amount, date):
         """Allows to add data to the database"""
         self.cur.execute("INSERT INTO expenses_record VALUES (?, ?, ?)",
-                         (item_name, item_price, purchase_date))
+                         (expense, amount, date))
         self.con.commit()
 
     def read_record(self, query):
@@ -25,12 +25,12 @@ class FinancialDb:
         self.cur.execute(query)
         return self.cur.fetchall()
 
-    def update_record(self, item_name, item_price, purchase_date, row_id):
+    def update_record(self, expense, amount, date, row_id):
         """Allows to update data from the database"""
         self.cur.execute(
             """UPDATE expenses_record SET item_name = ?, item_price = ?,
             purchase_date = ? WHERE rowid = ?""",
-            (item_name, item_price, purchase_date, row_id))
+            (expense, amount, date, row_id))
         self.con.commit()
 
     def delete_record(self, row_id):
