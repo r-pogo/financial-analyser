@@ -1,10 +1,18 @@
 import pandas as pd
-
+# TODO For future division of functionalities of analyser.py
 
 def insert_csv(file_path: str):
-    pass
-db = r"C:/Users/raf88/Desktop/Historia_Operacji_2023-08-13_11-02-01.csv"
-df = pd.read_csv(db, encoding="windows-1250", sep=";", header=1)
-fixed_db = df.to_csv('fixed_data.csv',  index=False) # this step deletes the extra comma that pandas put before the first column name
-ok_df = pd.read_csv('fixed_data.csv')
-print(ok_df)
+    db = file_path
+    df = pd.read_csv(db, encoding='windows-1250', sep=";", header=1,
+                     index_col=False)
+
+    for i in range(len(df)):
+        yield (df['Szczegóły transakcji'][i], df['Kwota operacji'][i], df['Data transakcji'][i])
+
+
+
+
+
+
+
+

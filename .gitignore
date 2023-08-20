@@ -4,4 +4,3 @@ __pycache__/
 .pytest_cache
 dist/
 expenses.db
-fixed_data.csv

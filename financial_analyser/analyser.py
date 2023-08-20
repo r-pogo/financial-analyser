@@ -4,8 +4,10 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 import datetime as dt
+import pandas as pd
 
 from financial_db import *
+
 
 DATA = FinancialDb(db_name='expenses.db')
 
@@ -90,7 +92,15 @@ def open_file():
         title='Select a file to open',
         filetypes=[('CSV', "*.csv")],
     )
-    print(file_path) # TODO import insert_csv()
+
+    db = file_path
+    df = pd.read_csv(db, encoding='windows-1250', sep=";", header=1,
+                     index_col=False)
+
+    for i in range(len(df)):
+        DATA.create_record(df['Szczegóły transakcji'][i],
+                           df['Kwota operacji'][i], df['Data transakcji'][i])
+
 # ---------------------------- UI SETUP ------------------------------- #
 
 
@@ -164,7 +174,7 @@ total_spent_btn = tk.Button(operation_widgets, text='Total Spent', font=FONT,
                             bg='#486966', fg='white',
                             command=lambda: messagebox.showinfo('Total',
                             DATA.read_record('SELECT SUM(amount) FROM '
-                            'expenses_record ')))
+                            'expenses_record '))) # TODO fix it calculate only negative numbers
 total_spent_btn.grid(row=0, column=3, sticky=tk.EW, padx=(10, 0))
 
 update_btn = tk.Button(operation_widgets, text='Update DB', font=FONT,
