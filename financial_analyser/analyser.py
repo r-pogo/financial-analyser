@@ -2,6 +2,7 @@ import contextlib
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 import datetime as dt
 
 from financial_db import *
@@ -36,6 +37,7 @@ def set_date():
 
 
 def fetch_records():
+    """Retrieves info from the DB and displays it on the treeview"""
     records = DATA.read_record('select rowid, * from expenses_record')
     global count
     for record in records:
@@ -49,6 +51,7 @@ def select_record(
         event):  # TODO czasami trzeba kliknac kilka razy, zrobic podswietleni dla wybranego wiersza
     global selected_rowid
     selected = treeview.focus()
+    treeview.selection_set(selected)
     val = treeview.item(selected, 'values')
 
     with contextlib.suppress(Exception):
@@ -80,6 +83,14 @@ def delete_row():
     refresh_data()
 
 
+def open_file():
+    """Open a CSV file"""
+
+    file_path = filedialog.askopenfilename(
+        title='Select a file to open',
+        filetypes=[('CSV', "*.csv")],
+    )
+    print(file_path) # TODO import insert_csv()
 # ---------------------------- UI SETUP ------------------------------- #
 
 
@@ -142,7 +153,7 @@ clear_btn = tk.Button(operation_widgets, text='Clear Entry', font=FONT,
 clear_btn.grid(row=1, column=2, sticky=tk.EW, padx=(10, 0))
 
 import_btn = tk.Button(operation_widgets, text='Import File', font=FONT,
-                       command=None, bg='#F0F8FF', fg='black')  # TODO function
+                       command=open_file, bg='#F0F8FF', fg='black')  # TODO function
 import_btn.grid(row=0, column=4, sticky=tk.EW, padx=(10, 0))
 
 exit_btn = tk.Button(operation_widgets, text='Exit', font=FONT,
@@ -155,8 +166,8 @@ total_spent_btn = tk.Button(operation_widgets, text='Total Spent', font=FONT,
                             DATA.read_record('SELECT SUM(amount) FROM '
                             'expenses_record ')))
 total_spent_btn.grid(row=0, column=3, sticky=tk.EW, padx=(10, 0))
-# com
-update_btn = tk.Button(operation_widgets, text='Update', font=FONT,
+
+update_btn = tk.Button(operation_widgets, text='Update DB', font=FONT,
                        bg='#C2BB00', fg='white', command=update_record)
 update_btn.grid(row=1, column=3, sticky=tk.EW, padx=(10, 0))
 
@@ -173,8 +184,13 @@ report_btn.grid(row=1, column=4, sticky=tk.EW, padx=(10, 0))
 ##################
 
 # Treeview
+style = ttk.Style()
+style.theme_use("default")
+style.map("Custom.Treeview", background=[
+              ('selected',  'blue'),
+          ]) # TODO not working, the row dosen't stays highlighted!
 treeview = ttk.Treeview(tree_scrollbar, selectmode='browse',
-                        columns=(1, 2, 3, 4), show='headings', height=8, )
+                        columns=(1, 2, 3, 4), show='headings', height=8, style="Custom.Treeview" )
 treeview.pack(side="left")
 
 treeview.column(1, anchor=tk.CENTER, stretch=tk.NO, width=70)
@@ -187,10 +203,6 @@ treeview.heading(3, text="Amount")
 treeview.heading(4, text="Date")
 
 treeview.bind("<ButtonRelease-1>", select_record)
-
-style = ttk.Style()
-style.theme_use("default")
-style.map("Treeview")
 
 # Scrollbar
 scrollbar = tk.Scrollbar(tree_scrollbar, orient='vertical')
