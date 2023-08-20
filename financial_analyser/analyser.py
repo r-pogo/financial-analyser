@@ -35,7 +35,7 @@ def clear_entries():
 
 def set_date():
     cur_date = dt.datetime.now()
-    date_var.set(f'{cur_date:%d %B %Y}')
+    date_var.set(f'{cur_date:%d %B %Y}') #TODO fix format in ex 20-06-1999
 
 
 def fetch_records():
@@ -46,7 +46,7 @@ def fetch_records():
         treeview.insert(parent='', index='0', iid=count,
                         values=(record[0], record[1], record[2], record[3]))
         count += 1
-    treeview.after(400, refresh_data)
+    treeview.after(400, refresh_data) # TODO to powoduje ze wiersz jest nie podswietlony
 
 
 def select_record(
@@ -68,7 +68,6 @@ def update_record():
     global selected_rowid
 
     selected = treeview.focus()
-    # Update record
     try:
         treeview.item(selected, text="",
                       values=(expense.get(), amount.get(), date.get()))
@@ -87,7 +86,7 @@ def delete_row():
 
 def open_file():
     """Open a CSV file"""
-
+    # TODO dodac try-except czyplik istniej
     file_path = filedialog.askopenfilename(
         title='Select a file to open',
         filetypes=[('CSV', "*.csv")],
@@ -96,7 +95,7 @@ def open_file():
     db = file_path
     df = pd.read_csv(db, encoding='windows-1250', sep=";", header=1,
                      index_col=False)
-
+    # TODO dodac try-except czy dane nie sa takie same???
     for i in range(len(df)):
         DATA.create_record(df['Szczegóły transakcji'][i],
                            df['Kwota operacji'][i], df['Data transakcji'][i])
@@ -196,11 +195,9 @@ report_btn.grid(row=1, column=4, sticky=tk.EW, padx=(10, 0))
 # Treeview
 style = ttk.Style()
 style.theme_use("default")
-style.map("Custom.Treeview", background=[
-              ('selected',  'blue'),
-          ]) # TODO not working, the row dosen't stays highlighted!
+style.map("Custom.Treeview", background=[('selected',  'blue')])
 treeview = ttk.Treeview(tree_scrollbar, selectmode='browse',
-                        columns=(1, 2, 3, 4), show='headings', height=8, style="Custom.Treeview" )
+                        columns=(1, 2, 3, 4), show='headings', height=10, style="Custom.Treeview" )
 treeview.pack(side="left")
 
 treeview.column(1, anchor=tk.CENTER, stretch=tk.NO, width=70)
@@ -231,7 +228,7 @@ window.configure(menu=menu)
 
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label='Menu', menu=file_menu)
-file_menu.add_command(label='Import data')  # command=open_file) # TODO
+file_menu.add_command(label='Import data', command=open_file)
 # file_menu.add_command(label='Save', command=save) # TODO create function
 file_menu.add_separator()
 file_menu.add_command(label='Quit', command=window.destroy)
