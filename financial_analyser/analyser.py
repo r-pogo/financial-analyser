@@ -174,7 +174,7 @@ total_spent_btn = tk.Button(operation_widgets, text='Total Spent', font=FONT,
                             bg='#486966', fg='white',
                             command=lambda: messagebox.showinfo('Total',
                             DATA.read_record('SELECT SUM(amount) FROM '
-                            'expenses_record '))) # TODO fix it calculate only negative numbers
+                            'expenses_record '))) # TODO fix it calculate only negative numbers, calculate by month
 total_spent_btn.grid(row=0, column=3, sticky=tk.EW, padx=(10, 0))
 
 update_btn = tk.Button(operation_widgets, text='Update DB', font=FONT,
@@ -182,7 +182,7 @@ update_btn = tk.Button(operation_widgets, text='Update DB', font=FONT,
 update_btn.grid(row=1, column=3, sticky=tk.EW, padx=(10, 0))
 
 delete_btn = tk.Button(operation_widgets, text='Delete', font=FONT,
-                       bg='#BD2A2E', fg='white', command=delete_row)
+                       bg='#BD2A2E', fg='white', command=delete_row) # TODO delete by date
 delete_btn.grid(row=2, column=3, sticky=tk.EW, padx=(10, 0))
 
 report_btn = tk.Button(operation_widgets, text='Report', font=FONT,
@@ -231,8 +231,8 @@ window.configure(menu=menu)
 
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label='Menu', menu=file_menu)
-file_menu.add_command(label='Open file')  # command=open_file)
-# file_menu.add_command(label='Save', command=save)
+file_menu.add_command(label='Import data')  # command=open_file) # TODO
+# file_menu.add_command(label='Save', command=save) # TODO create function
 file_menu.add_separator()
 file_menu.add_command(label='Quit', command=window.destroy)
 
